@@ -1,67 +1,294 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>판문점 견학 안내</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>판문점 견학 안내</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: The application uses a top-down, "inverted pyramid" structure. It starts with the most critical information: the current tour status, presented in a highly visible banner. This immediately answers the user's primary question. Following this is an interactive timeline to provide historical context for the suspension. The bulk of the detailed (but currently invalid) information is organized into collapsible accordion sections (FAQs). This prevents information overload and allows users to explore rules and regulations at their own pace. The design concludes with a clear call-to-action, directing users to the only reliable official sources. This structure prioritizes immediate clarity, contextual understanding, and user-controlled exploration, which is more effective for this topic than a dashboard or a structure that mirrors the original document. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Current tour status is suspended. -> Goal: Inform Immediately. -> Viz/Presentation: High-contrast, colored banner with large text. -> Interaction: None. -> Justification: Maximum clarity for the most vital piece of information. -> Method: HTML/Tailwind.
+        - Report Info: Series of events (suspension, partial resumptions, re-suspensions). -> Goal: Show Change Over Time. -> Viz/Presentation: Interactive horizontal timeline. -> Interaction: Clicking a date reveals detailed information in a separate panel. -> Justification: Visually communicates the fluid and unstable nature of the tour status more effectively than a list. -> Method: HTML/Tailwind for layout, Vanilla JS for interaction.
+        - Report Info: Detailed rules (Eligibility, application, prohibited items). -> Goal: Organize for Future Reference. -> Viz/Presentation: Collapsible accordion/FAQ sections. -> Interaction: Clicking a header expands/collapses the content. -> Justification: Organizes dense, non-urgent information cleanly, preventing the page from being overwhelmingly long and allowing users to pull information as needed. -> Method: HTML/Tailwind, Vanilla JS for toggle functionality.
+        - Report Info: Prohibited/Required items and behaviors. -> Goal: Inform Clearly. -> Viz/Presentation: Two-column "Do's & Don'ts" list with Unicode icons. -> Interaction: None. -> Justification: Icons and clear separation make the rules highly scannable and easier to remember than a simple text block. -> Method: HTML/Tailwind with Unicode characters.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+        }
+        .timeline-item-content {
+            transition: all 0.3s ease-in-out;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+        .accordion-button.active + .accordion-content {
+            max-height: 1000px;
+        }
+        .accordion-button .icon-plus, .accordion-button.active .icon-minus {
+            display: inline-block;
+        }
+        .accordion-button .icon-minus, .accordion-button.active .icon-plus {
+            display: none;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-  <div class="max-w-3xl mx-auto p-6">
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold text-center">판문점 견학 안내</h1>
-      <p class="text-center text-gray-600">2023년 7월 18일 이후 일반 견학이 무기한 중단되었습니다.</p>
-    </header>
+<body class="bg-[#F8F7F4] text-[#333333]">
 
-    <section class="mb-8">
-      <div class="bg-red-600 text-white p-4 rounded-lg text-center">
-        <p class="text-lg font-semibold">⚠️ 현재 일반 견학 중단 중</p>
-        <p>재개 시 별도 공지가 있을 예정입니다.</p>
-      </div>
-    </section>
+    <div class="container mx-auto max-w-5xl p-4 sm:p-6 md:p-8">
+        
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-[#2c3e50] mb-2">판문점 견학 안내</h1>
+            <p class="text-md md:text-lg text-gray-600">가장 최신 정보를 바탕으로 한 판문점 견학 현황입니다.</p>
+        </header>
 
-    <section class="mb-8">
-      <h2 class="text-xl font-bold mb-4">중단 이후 주요 일정</h2>
-      <ul class="space-y-2">
-        <li class="bg-white p-4 rounded shadow">
-          <p class="font-semibold">2023년 7월</p>
-          <p>주한미군 병사 월북 사건으로 견학 전면 중단</p>
-        </li>
-        <li class="bg-white p-4 rounded shadow">
-          <p class="font-semibold">2023년 11월</p>
-          <p>특별견학 잠정 재개 및 8일 후 재중단</p>
-        </li>
-        <li class="bg-white p-4 rounded shadow">
-          <p class="font-semibold">2025년 5월</p>
-          <p>정책 고객 대상 부분 재개</p>
-        </li>
-      </ul>
-    </section>
+        <section id="status" class="mb-8 md:mb-12">
+            <div class="bg-red-700 text-white rounded-lg p-6 text-center shadow-lg">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2">일반 견학 잠정 중단</h2>
+                <p class="text-base md:text-lg">2023년 7월 18일 미군 병사 월북 사건 이후, 방문객의 안전을 고려하여 판문점 일반 견학이 무기한 중단되었습니다. 재개 시 별도 공지 예정입니다.</p>
+            </div>
+        </section>
 
-    <section class="mb-8">
-      <h2 class="text-xl font-bold mb-4">참고 정보 (견학 재개 시)</h2>
-      <div class="bg-white p-4 rounded shadow">
-        <h3 class="font-semibold mb-2">신청 대상</h3>
-        <ul class="list-disc list-inside">
-          <li>만 8세 이상 대한민국 국민</li>
-          <li>연 1회 제한</li>
-          <li>외국인은 지정 여행사 문의</li>
-        </ul>
-      </div>
-      <div class="bg-white p-4 rounded shadow mt-4">
-        <h3 class="font-semibold mb-2">유의사항</h3>
-        <ul class="list-disc list-inside">
-          <li>신분증 지참 필수</li>
-          <li>음주 및 금지 물품 반입 불가</li>
-          <li>허가되지 않은 촬영 금지</li>
-        </ul>
-      </div>
-    </section>
+        <section id="timeline-section" class="mb-8 md:mb-12">
+            <h2 class="text-2xl font-bold text-center mb-6 text-[#2c3e50]">견학 중단 이후 주요 경과</h2>
+             <div class="w-full max-w-3xl mx-auto">
+                <div id="timeline-buttons" class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+                    <button data-target="event-1" class="timeline-btn text-sm p-2 rounded-lg bg-white shadow-md border border-gray-200 hover:bg-blue-100 focus:bg-blue-600 focus:text-white transition">2023년 7월</button>
+                    <button data-target="event-2" class="timeline-btn text-sm p-2 rounded-lg bg-white shadow-md border border-gray-200 hover:bg-blue-100 focus:bg-blue-600 focus:text-white transition">2023년 11월 (상)</button>
+                    <button data-target="event-3" class="timeline-btn text-sm p-2 rounded-lg bg-white shadow-md border border-gray-200 hover:bg-blue-100 focus:bg-blue-600 focus:text-white transition">2023년 11월 (하)</button>
+                    <button data-target="event-4" class="timeline-btn text-sm p-2 rounded-lg bg-white shadow-md border border-gray-200 hover:bg-blue-100 focus:bg-blue-600 focus:text-white transition">2025년 5월</button>
+                    <button data-target="event-5" class="timeline-btn text-sm p-2 rounded-lg bg-white shadow-md border border-gray-200 hover:bg-blue-100 focus:bg-blue-600 focus:text-white transition">현재</button>
+                </div>
+                <div id="timeline-content-area" class="bg-white p-6 rounded-lg shadow-lg min-h-[150px] border border-gray-200">
+                    <div id="event-1" class="timeline-item-content hidden">
+                        <h3 class="font-bold text-lg text-blue-800 mb-2">견학 전면 중단</h3>
+                        <p class="text-gray-700">2023년 7월 18일, 주한미군 병사가 판문점 공동경비구역(JSA)을 통해 월북하는 사건이 발생했습니다. 이 사건으로 인해 방문객 안전 확보를 위해 모든 판문점 견학이 즉시 중단되었습니다.</p>
+                    </div>
+                    <div id="event-2" class="timeline-item-content hidden">
+                        <h3 class="font-bold text-lg text-blue-800 mb-2">특별견학 잠정 재개</h3>
+                        <p class="text-gray-700">2023년 11월 22일, 정부 관련 인력 등 '정책 고객'을 대상으로 하는 특별견학이 제한적으로 재개되었습니다. 이는 일반인에게는 해당되지 않는 프로그램이었습니다.</p>
+                    </div>
+                     <div id="event-3" class="timeline-item-content hidden">
+                        <h3 class="font-bold text-lg text-blue-800 mb-2">특별견학 재중단</h3>
+                        <p class="text-gray-700">2023년 11월 30일, 9.19 군사합의 일부 효력 정지에 대한 북한의 반발로 JSA 내 군사적 긴장이 고조되자, 불과 8일 만에 특별견학이 다시 중단되었습니다.</p>
+                    </div>
+                    <div id="event-4" class="timeline-item-content hidden">
+                        <h3 class="font-bold text-lg text-blue-800 mb-2">특별견학 부분 재개</h3>
+                        <p class="text-gray-700">2025년 5월, 약 1년 6개월 만에 통일부 주관의 '정책 고객' 대상 특별견학이 다시 부분적으로 재개되었습니다. 이 역시 일반인 견학과는 무관합니다.</p>
+                    </div>
+                    <div id="event-5" class="timeline-item-content">
+                        <h3 class="font-bold text-lg text-blue-800 mb-2">일반견학 중단 유지</h3>
+                        <p class="text-gray-700">현재 일반 대중을 위한 판문점 견학은 여전히 중단된 상태입니다. 재개 일정은 미정이며, 모든 정보는 공식 채널을 통해 공지될 예정입니다. 이 페이지의 아래 정보들은 견학 재개 시 참고용으로 활용하시기 바랍니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <footer class="text-center mt-8 border-t pt-4">
-      <p>최신 정보 확인: <a href="https://www.panmuntour.go.kr/index.do" class="text-blue-600 underline">판문점 견학지원센터</a></p>
-      <p class="text-gray-600">콜센터 1588-8889</p>
-    </footer>
-  </div>
+        <section id="faq" class="mb-8 md:mb-12">
+            <h2 class="text-2xl font-bold text-center mb-6 text-[#2c3e50]">참고: 견학 재개 시 예상 규정</h2>
+            <p class="text-center text-gray-600 mb-6 max-w-2xl mx-auto">아래 내용은 과거 규정을 바탕으로 한 정보이며, 실제 견학이 재개될 경우 변경될 수 있습니다. 반드시 공식 발표를 확인하시기 바랍니다.</p>
+            
+            <div class="space-y-4 max-w-3xl mx-auto">
+                <div class="bg-white rounded-lg shadow-md border border-gray-200">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-4 font-semibold text-lg text-gray-800 hover:bg-gray-50 transition">
+                        <span>신청 대상</span>
+                        <span class="text-blue-600"><span class="icon-plus">＋</span><span class="icon-minus">－</span></span>
+                    </button>
+                    <div class="accordion-content px-4 pb-4 text-gray-700">
+                        <ul class="list-disc list-inside space-y-2">
+                            <li>만 8세 이상의 대한민국 국민만 신청 가능합니다. (개인별 5명까지)</li>
+                            <li>개인별 견학 횟수는 해당 연도 1회로 제한됩니다.</li>
+                            <li>단체나 외국인은 정부의 일반 견학 프로그램으로 직접 신청할 수 없습니다. (외국인은 지정된 여행사를 통해 별도 문의)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md border border-gray-200">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-4 font-semibold text-lg text-gray-800 hover:bg-gray-50 transition">
+                        <span>운영 및 신청 일정</span>
+                        <span class="text-blue-600"><span class="icon-plus">＋</span><span class="icon-minus">－</span></span>
+                    </button>
+                    <div class="accordion-content px-4 pb-4 text-gray-700">
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><b>운영일:</b> 매주 화, 수, 금, 토요일 (과거 기준)</li>
+                            <li><b>신청 개시:</b> 견학 희망일 기준 전월 1일 오전 10시</li>
+                            <li><b>신청 마감:</b> 견학일 기준 20일 전 23:59 마감</li>
+                            <li><b>취소 기한:</b> 견학일 기준 7일 전까지 가능</li>
+                            <li>견학 확정은 신원조사 후 문자로 개별 안내됩니다.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-md border border-gray-200">
+                    <button class="accordion-button w-full flex justify-between items-center text-left p-4 font-semibold text-lg text-gray-800 hover:bg-gray-50 transition">
+                        <span>견학 시 유의사항</span>
+                        <span class="text-blue-600"><span class="icon-plus">＋</span><span class="icon-minus">－</span></span>
+                    </button>
+                    <div class="accordion-content px-4 pb-4 text-gray-700">
+                         <div class="grid md:grid-cols-2 gap-6">
+                             <div>
+                                <h4 class="font-bold mb-2 text-green-700">✔️ 필수 및 허용 사항</h4>
+                                <ul class="list-inside space-y-2">
+                                    <li>👤 신분증 반드시 지참 (주민등록증, 운전면허증, 여권 등)</li>
+                                    <li>⏰ 임진각 판문점견학안내소 집결 시간 엄수</li>
+                                    <li>💧 생수 소지 가능</li>
+                                    <li>🦯 거동 불편 시 지팡이 소지 허용</li>
+                                </ul>
+                             </div>
+                             <div>
+                                <h4 class="font-bold mb-2 text-red-700">❌ 금지 사항</h4>
+                                <ul class="list-inside space-y-2">
+                                    <li>👕 민소매, 반바지, 짧은 치마, 샌들, 슬리퍼, 위장무늬 복장</li>
+                                    <li>🍺 견학 당일 음주</li>
+                                    <li>🎒 무기류, 음식물, 액션캠, 삼각대, 셀카봉 소지</li>
+                                    <li>📸 허가되지 않은 군사시설 및 지역 촬영</li>
+                                    <li>🚫 군부대 제한 구역 무단 출입</li>
+                                </ul>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="ai-qa-section" class="mb-8 md:mb-12 bg-blue-50 p-6 rounded-lg shadow-lg border border-blue-200">
+            <h2 class="text-2xl font-bold text-center mb-6 text-[#2c3e50]">✨ 판문점 AI 질문하기</h2>
+            <p class="text-center text-gray-700 mb-6 max-w-2xl mx-auto">판문점, DMZ, 또는 남북 관계 역사와 관련된 궁금한 점을 질문해주세요. 인공지능이 간결하게 답변해 드립니다.</p>
+            
+            <div class="max-w-xl mx-auto">
+                <div class="mb-4">
+                    <label for="ai-question-input" class="block text-gray-700 text-sm font-bold mb-2">질문 입력:</label>
+                    <textarea id="ai-question-input" rows="3" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200" placeholder="예: 판문점은 왜 중요한가요?"></textarea>
+                </div>
+                <button id="ask-ai-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg w-full transition duration-200 shadow-md">
+                    ✨ 질문하기
+                </button>
+                <div id="ai-loading-indicator" class="hidden text-center mt-4 text-blue-600 font-semibold">
+                    답변을 생성 중입니다...
+                </div>
+                <div id="ai-answer-output" class="mt-6 p-4 bg-white rounded-lg shadow-inner border border-gray-200 min-h-[100px] text-gray-800 leading-relaxed">
+                    여기에 답변이 표시됩니다.
+                </div>
+            </div>
+        </section>
+
+        <footer id="contact" class="text-center pt-8 border-t border-gray-300">
+            <h2 class="text-2xl font-bold text-[#2c3e50] mb-4">가장 정확한 정보 확인</h2>
+            <p class="text-gray-600 mb-6 max-w-2xl mx-auto">견학 관련 정보는 매우 유동적입니다. 방문을 계획하기 전, 반드시 아래 공식 채널을 통해 최신 정보를 직접 확인하시기 바랍니다.</p>
+            <div class="inline-flex flex-col sm:flex-row gap-4">
+                 <a href="https://www.panmuntour.go.kr/index.do" target="_blank" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition shadow-md">
+                    판문점 견학지원센터 홈페이지
+                </a>
+                <div class="bg-gray-100 text-gray-800 font-bold py-3 px-6 rounded-lg border border-gray-300 shadow-md">
+                    콜센터: 1588-8889
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const timelineButtons = document.querySelectorAll('.timeline-btn');
+            const timelineContents = document.querySelectorAll('.timeline-item-content');
+            let activeTimelineBtn = document.querySelector('[data-target="event-5"]');
+            
+            function showContent(targetId) {
+                timelineContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                const targetContent = document.getElementById(targetId);
+                if (targetContent) {
+                    targetContent.classList.remove('hidden');
+                }
+            }
+
+            timelineButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    
+                    if (activeTimelineBtn) {
+                         activeTimelineBtn.classList.remove('bg-blue-600', 'text-white');
+                         activeTimelineBtn.classList.add('bg-white');
+                    }
+                    
+                    button.classList.add('bg-blue-600', 'text-white');
+                    button.classList.remove('bg-white');
+                    activeTimelineBtn = button;
+
+                    showContent(targetId);
+                });
+            });
+            
+            if (activeTimelineBtn) {
+                activeTimelineBtn.classList.add('bg-blue-600', 'text-white');
+                activeTimelineBtn.classList.remove('bg-white');
+            }
+            showContent('event-5');
+            
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.classList.toggle('active');
+                });
+            });
+
+            // Gemini API Integration
+            const askAiButton = document.getElementById('ask-ai-button');
+            const aiQuestionInput = document.getElementById('ai-question-input');
+            const aiAnswerOutput = document.getElementById('ai-answer-output');
+            const aiLoadingIndicator = document.getElementById('ai-loading-indicator');
+
+            askAiButton.addEventListener('click', async () => {
+                const userQuestion = aiQuestionInput.value.trim();
+                if (!userQuestion) {
+                    aiAnswerOutput.textContent = '질문을 입력해주세요.';
+                    return;
+                }
+
+                aiAnswerOutput.textContent = ''; // Clear previous answer
+                aiLoadingIndicator.classList.remove('hidden'); // Show loading indicator
+
+                try {
+                    let chatHistory = [];
+                    const prompt = `판문점, DMZ, 또는 남북 관계 역사와 관련된 질문에 대해 간결하고 정확하게 답변해주세요. 답변은 200자 이내로 해주세요. 질문: ${userQuestion}`;
+                    chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; 
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        aiAnswerOutput.textContent = text;
+                    } else {
+                        aiAnswerOutput.textContent = '답변을 생성할 수 없습니다. 다시 시도해주세요.';
+                        console.error('Unexpected API response structure:', result);
+                    }
+                } catch (error) {
+                    aiAnswerOutput.textContent = '오류가 발생했습니다. 네트워크 연결을 확인하거나 나중에 다시 시도해주세요.';
+                    console.error('Error calling Gemini API:', error);
+                } finally {
+                    aiLoadingIndicator.classList.add('hidden'); // Hide loading indicator
+                }
+            });
+        });
+    </script>
 </body>
 </html>
